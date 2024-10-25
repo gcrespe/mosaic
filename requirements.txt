@@ -1,0 +1,7 @@
+pandas
+numpy
+matplotlib
+backtesting
+bokeh
+requests
+flask

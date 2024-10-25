@@ -2,15 +2,11 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
-from backtesting import Backtest
 from bokeh.plotting import output_file
-from bokeh.models import Title
-import os
+from backtesting import Backtest
 
 def run_backtest(strategy_class, strategy_name, data_file='preprocessed_stock_data.csv', display_plot=True):
-    from bokeh.io import save
-    from backtesting import Backtest
-    from bokeh.resources import CDN
+    
 
     try:
         print(f"\nRunning Backtest for {strategy_name}...\n")
