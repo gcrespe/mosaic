@@ -2,7 +2,18 @@
 
 from backtesting import Strategy
 from backtesting.lib import crossover
-from indicators import StochasticOscillator
+import pandas as pd
+import numpy as np
+
+def StochasticOscillator(high_prices, low_prices, close_prices, n=14):
+    """
+    Calculate the Stochastic Oscillator (%K and %D lines).
+    """
+    lowest_low = pd.Series(low_prices).rolling(window=n).min()
+    highest_high = pd.Series(high_prices).rolling(window=n).max()
+    percent_k = 100 * (close_prices - lowest_low) / (highest_high - lowest_low)
+    percent_d = percent_k.rolling(window=3).mean()
+    return percent_k.values, percent_d.values
 
 class StochasticStrategy(Strategy):
     """
@@ -14,12 +25,6 @@ class StochasticStrategy(Strategy):
     n = 14
     overbought = 80
     oversold = 20
-
-    print("Stochastic Strategy Parameters:")
-    print(f"- Period (n): {n}")
-    print(f"- Overbought Threshold: {overbought}")
-    print(f"- Oversold Threshold: {oversold}")
-    print("")
 
     def init(self):
         high_prices = self.data.High

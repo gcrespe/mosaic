@@ -4,19 +4,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from bokeh.plotting import output_file
 from backtesting import Backtest
+import os
 
-def run_backtest(strategy_class, strategy_name, data_file='preprocessed_stock_data.csv', display_plot=True):
-    
+
+def run_backtest(strategy_class, strategy_name):
+    print("Working Directory: {}".format(os.getcwd()))
 
     try:
         print(f"\nRunning Backtest for {strategy_name}...\n")
-        stock_data = pd.read_csv(data_file, index_col='date', parse_dates=True)
+        stock_data = pd.read_csv('preprocessed_stock_data.csv', index_col='date', parse_dates=True)
         bt = Backtest(stock_data, strategy_class, cash=10000, commission=.002)
         stats = bt.run()
-        if display_plot:
-            output_file(f"{strategy_name}_backtest.html")
-            bt.plot(filename=f"{strategy_name}_backtest.html", open_browser=False)
-            print(f"Plot saved to {strategy_name}_backtest.html")
+        # if display_plot:
+        #     output_file(f"{strategy_name}_backtest.html")
+        #     bt.plot(filename=f"{strategy_name}_backtest.html", open_browser=False)
+        #     print(f"Plot saved to {strategy_name}_backtest.html")
 
         print(f"Statistics for {strategy_name}:\n")
         print(stats)

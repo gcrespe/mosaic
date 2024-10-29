@@ -4,17 +4,26 @@ import os
 import pandas as pd
 
 # Import data preprocessing functions
-from data_preprocessing import get_historical_data, preprocess_data
+from algo.data_preprocessing import get_historical_data, preprocess_data
 
 # Import strategy classes
-from strategies.rsi_strategy import RSIStrategy
-from strategies.moving_average_strategy import MovingAverageStrategy
-from strategies.stochastic_strategy import StochasticStrategy
-from strategies.bollinger_bands_strategy import BollingerBandsStrategy
-from strategies.macd_strategy import MACDStrategy
+from algo.strategies.rsi_strategy import RSIStrategy
+from algo.strategies.moving_average_strategy import MovingAverageStrategy
+from algo.strategies.stochastic_strategy import StochasticStrategy
+from algo.strategies.bollinger_bands_strategy import BollingerBandsStrategy
+from algo.strategies.macd_strategy import MACDStrategy
 
 # Import backtesting utilities
-from backtesting_utils import compare_backtests
+from algo.backtesting_utils import compare_backtests
+
+
+strategies = [
+    (RSIStrategy, "RSI Strategy"),
+    (MovingAverageStrategy, "Moving Average Strategy"),
+    (MACDStrategy, "MACD Strategy"),
+    (BollingerBandsStrategy, "Bollinger Bands Strategy"),
+    (StochasticStrategy, "Stochastic Oscillator Strategy"),
+]
 
 def main():
     # Step 1: Data Gathering and Preprocessing
@@ -38,19 +47,6 @@ def main():
             return  # Exit the script if data fetching fails
     else:
         print(f"Data file '{data_file}' already exists. Skipping data fetching.")
-
-    # Step 2: Run Backtests and Compare Strategies
-    # List of strategies to compare
-    strategies = [
-        (RSIStrategy, "RSI Strategy"),
-        (MovingAverageStrategy, "Moving Average Strategy"),
-        (MACDStrategy, "MACD Strategy"),
-        (BollingerBandsStrategy, "Bollinger Bands Strategy"),
-        (StochasticStrategy, "Stochastic Oscillator Strategy"),
-    ]
-
+        
     # Compare the strategies
     compare_backtests(strategies)
-
-if __name__ == "__main__":
-    main()
