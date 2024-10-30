@@ -8,43 +8,20 @@ import os
 API_KEY = 'Q9RVxM49GO6ZeIpyZSr4CXBZpnnZyWOk'  # Ensure this environment variable is set
 BASE_URL = 'https://api.polygon.io/v2/aggs/ticker/'
 
-def get_historical_data(ticker, multiplier, timespan, start_date, end_date):
+def get_historical_data(ticker, multiplier, timespan, start_date):
     """
     Fetches historical data from Polygon.io and returns it as a pandas DataFrame.
     Handles pagination to retrieve all available data.
     """
-    url = f'{BASE_URL}{ticker}/range/{multiplier}/{timespan}/{start_date}/{end_date}'
+    url = f'{BASE_URL}{ticker}/range/{multiplier}/{timespan}/{start_date}'
     params = {
         'apiKey': API_KEY
     }
-    all_results = []
 
-    while True:
-        response = requests.get(url, params=params)
-        if response.status_code == 200:
-            json_response = response.json()
-            results = json_response.get('results', [])
-            if results:
-                all_results.extend(results)
-            else:
-                print("No results in the response.")
-                break
-
-            next_url = json_response.get('next_url')
-            if next_url:
-                # Use the next_url for the next request
-                url = next_url
-                params = {
-                    'apiKey': API_KEY
-                }
-            else:
-                # No more pages to fetch
-                break
-        else:
-            print(f"Error fetching data: {response.status_code} - {response.text}")
-            break
-
-    if all_results:
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        json_response = response.json()
+        all_results = json_response.get('results', [])
         df = pd.DataFrame(all_results)
         df['date'] = pd.to_datetime(df['t'], unit='ms')  # Convert timestamp to datetime
         return df
