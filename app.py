@@ -46,7 +46,7 @@ def webhook():
     order_type = data.get('type', 'market')  # e.g., "market"
     qty = data.get('qty')  # number of shares to trade
     time_in_force = data.get('time_in_force', 'gtc')
-    order_class = data.get('order_class', 'bracket')
+    order_class = data.get('order_class', 'simple')
     price = data.get('price')
 
     try:
@@ -94,18 +94,3 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return "500"
-
-
-def serialize(value):
-    if isinstance(value, pd.Timestamp):
-        return value.isoformat()
-    elif isinstance(value, pd.Timedelta):
-        return str(value)
-    elif isinstance(value, np.float64) or isinstance(value, np.int64):
-        return float(value)
-    elif isinstance(value, pd.DataFrame):
-        # Para DataFrames que estão dentro de outros objetos, convertê-los também
-        return value.to_dict(orient='list')
-    else:
-        return value
-    
