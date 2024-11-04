@@ -1,5 +1,5 @@
 pandas
-gunicorn
+waitress
 numpy
 matplotlib
 backtesting
