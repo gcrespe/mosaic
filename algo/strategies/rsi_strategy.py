@@ -25,12 +25,6 @@ class RSIStrategy(Strategy):
     rsi_overbought = 70
     rsi_oversold = 30
 
-    print(f"RSI Strategy Parameters:")
-    print(f"- RSI Period: {rsi_period}")
-    print(f"- RSI Overbought: {rsi_overbought}")
-    print(f"- RSI Oversold: {rsi_oversold}")
-    print("")
-
     def init(self):
         close_prices = self.data.Close
         self.rsi = self.I(RSI, close_prices, self.rsi_period)
