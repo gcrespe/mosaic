@@ -11,8 +11,8 @@ from algo.strategies.rsi_strategy import RSIStrategy
 from algo.data_preprocessing import get_historical_data
 
 # Alpaca API credentials (use paper trading endpoint)
-ALPACA_API_KEY = 'PKEKYF6AH5U80QNARDZO'
-ALPACA_SECRET_KEY = 'DKtUwKu9om7cZqfnTz2micf5BRiDNg16JM1xYo8p'
+ALPACA_API_KEY = 'PKTAVXT2KV81VZ9SMAH0'
+ALPACA_SECRET_KEY = 'af3ZPiFWidZRx3Z66EcMt4mdQ2C724nahSStqleb'
 ALPACA_BASE_URL = 'https://paper-api.alpaca.markets/'
 
 # Initialize Alpaca API client
@@ -90,6 +90,8 @@ def alpacaTradingviewWebhook():
 
     if not data:
         return jsonify({'message': 'No data received'}), 400
+    
+    app.logger.warn('Order data: %s', request.get_json())
 
     #TradingView
     side = data.get('side')  # "buy" or "sell"
@@ -113,6 +115,9 @@ def alpacaTradingviewWebhook():
         order_response = trading_client.submit_order(  
             order_data=market_order_data
         )
+
+        print(order_response.model)
+
         return jsonify({
             "id": order_response.id,
             "type": order_response.type,
