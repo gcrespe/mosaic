@@ -116,7 +116,7 @@ def alpacaTradingviewWebhook():
             order_data=market_order_data
         )
 
-        print(order_response.model_dump_json)
+        app.logger.warning("Order response ", order_response.model_dump_json)
 
         return jsonify({
             "id": order_response.id,
