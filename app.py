@@ -91,7 +91,7 @@ def alpacaTradingviewWebhook():
     if not data:
         return jsonify({'message': 'No data received'}), 400
     
-    app.logger.warn('Order data: %s', request.get_json())
+    app.logger.info('Order data: %s', request.get_json())
 
     #TradingView
     side = data.get('side')  # "buy" or "sell"
@@ -116,16 +116,23 @@ def alpacaTradingviewWebhook():
             order_data=market_order_data
         )
 
-        app.logger.warning("Order response ", order_response.model_dump_json)
-
-        return jsonify({
+        json_response = jsonify({
+            "symbol": order_response.symbol,
             "id": order_response.id,
             "type": order_response.type,
+            "class": order_response.order_class,
             "filled_at": order_response.filled_at,
+            "qty": order_response.qty,
             "filled_qty": order_response.filled_qty,
             "filled_avg_price": order_response.filled_avg_price,
-            "status": order_response.status
-        }), 200
+            "status": order_response.status,
+
+        })
+
+        app.logger.info("Order response %s", json_response)
+
+        return json_response, 200
+    
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 500
     
