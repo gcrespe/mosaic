@@ -6,3 +6,4 @@ backtesting
 bokeh
 requests
 flask
+alpaca-trade-api
