@@ -1,62 +1,64 @@
-# data_preprocessing.py
-
-import requests
+from alpaca.data.requests import StockBarsRequest
+from alpaca.data.timeframe import TimeFrame
+from algo.config.alpaca_config import stock_client
 import pandas as pd
-import os
 
-# Load your API key from an environment variable
-API_KEY = 'Q9RVxM49GO6ZeIpyZSr4CXBZpnnZyWOk'  # Ensure this environment variable is set
-BASE_URL = 'https://api.polygon.io/v2/aggs/ticker/'
-
-def get_historical_data(ticker, multiplier, timespan, start_date):
+def get_historical_data(symbol, timeframe='1Hour', start_date=None, end_date=None):
     """
-    Fetches historical data from Polygon.io and returns it as a pandas DataFrame.
-    Handles pagination to retrieve all available data.
+    Fetch historical data and store it for backtesting
     """
-    url = f'{BASE_URL}{ticker}/range/{multiplier}/{timespan}/{start_date}'
-    params = {
-        'apiKey': API_KEY
-    }
-
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        json_response = response.json()
-        all_results = json_response.get('results', [])
-        df = pd.DataFrame(all_results)
-        df['date'] = pd.to_datetime(df['t'], unit='ms')  # Convert timestamp to datetime
+    # Create TimeFrame instances correctly
+    if timeframe == '1Min':
+        tf = TimeFrame.Minute
+    elif timeframe == '2Min':
+        tf = TimeFrame(2, 'Min')
+    elif timeframe == '3Min':
+        tf = TimeFrame(3, 'Min')
+    elif timeframe == '5Min':
+        tf = TimeFrame(5, 'Min')
+    elif timeframe == '1Hour':
+        tf = TimeFrame.Hour
+    elif timeframe == '1Day':
+        tf = TimeFrame.Day
+    else:
+        raise ValueError(f"Invalid timeframe: {timeframe}")
+    
+    # Parse dates
+    start = pd.Timestamp(start_date).tz_localize('UTC') if start_date else pd.Timestamp('2020-01-01').tz_localize('UTC')
+    end = pd.Timestamp(end_date).tz_localize('UTC') if end_date else pd.Timestamp.now(tz='UTC')
+    
+    # Create request parameters
+    request_params = StockBarsRequest(
+        symbol_or_symbols=symbol,
+        timeframe=tf,
+        start=start,
+        end=end
+    )
+    
+    try:
+        # Get the data
+        bars = stock_client.get_stock_bars(request_params)
+        
+        # Convert to DataFrame
+        df = pd.DataFrame([
+            {
+                'Open': bar.open,
+                'High': bar.high,
+                'Low': bar.low,
+                'Close': bar.close,
+                'Volume': bar.volume,
+                'Timestamp': bar.timestamp
+            }
+            for bar in bars.data[symbol]
+        ])
+        
+        # Set the index to Timestamp
+        df.set_index('Timestamp', inplace=True)
+        
+        # Sort index
+        df.sort_index(inplace=True)
+        
         return df
-    else:
-        print("No data returned for the given parameters.")
-        return None
-
-def preprocess_data(df):
-    """
-    Preprocesses the data for backtesting, renames columns, and sets the index.
-    """
-    df.rename(columns={
-        'o': 'Open',
-        'h': 'High',
-        'l': 'Low',
-        'c': 'Close',
-        'v': 'Volume'
-    }, inplace=True)
-    df.set_index('date', inplace=True)
-    df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
-    df.sort_index(inplace=True)
-    return df
-
-# Example of how to gather and preprocess data
-if __name__ == "__main__":
-    ticker = 'AAPL'  # Example ticker symbol
-    multiplier = 1
-    timespan = 'hour'  # Fetch hourly data
-    start_date = '2023-09-01'  # Adjust as needed
-    end_date = '2023-10-01'    # Adjust as needed
-
-    stock_data = get_historical_data(ticker, multiplier, timespan, start_date, end_date)
-    if stock_data is not None:
-        stock_data = preprocess_data(stock_data)
-        stock_data.to_csv('preprocessed_stock_data.csv')  # Save the preprocessed data to a CSV file
-        print("Data gathering and preprocessing completed successfully.")
-    else:
-        print("Data gathering failed.")
+    
+    except Exception as e:
+        raise Exception(f"Error fetching data: {str(e)}")

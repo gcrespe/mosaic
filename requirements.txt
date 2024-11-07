@@ -10,3 +10,4 @@ alpaca-trade-api
 flask-restful
 flasgger
 alpaca-py
+ta
