@@ -112,6 +112,61 @@ def run_enhanced_trend_backtest(data: pd.DataFrame,
         '_strategy': str(stats['_strategy'])
     }
 
+def run_random_trade_backtest(data: pd.DataFrame, 
+                            strategy_params: Dict[str, Any] = None) -> Dict[str, Any]:
+    """
+    Run backtest for the Random Trade Strategy
+    
+    Args:
+        data: DataFrame with OHLCV data
+        strategy_params: Dictionary of strategy parameters to override defaults
+        
+    Returns:
+        Dictionary containing backtest statistics
+    """
+    from algo.strategies.random_trade_strategy import RandomTradeStrategy
+    
+    # Create backtest instance
+    bt = Backtest(data, 
+                  RandomTradeStrategy, 
+                  cash=100000,
+                  commission=.002,
+                  exclusive_orders=True)
+    
+    # Run backtest with optional parameters
+    stats = bt.run(**(strategy_params or {}))
+    
+    # Return statistics with rounded values
+    return {
+        'Start': str(stats['Start']),
+        'End': str(stats['End']),
+        'Duration': str(stats['Duration']),
+        'Exposure Time [%]': round(stats['Exposure Time [%]'], 3),
+        'Equity Final [$]': round(stats['Equity Final [$]'], 3),
+        'Equity Peak [$]': round(stats['Equity Peak [$]'], 3),
+        'Return [%]': round(stats['Return [%]'], 3),
+        'Buy & Hold Return [%]': round(stats['Buy & Hold Return [%]'], 3),
+        'Return (Ann.) [%]': round(stats['Return (Ann.) [%]'], 3),
+        'Volatility (Ann.) [%]': round(stats['Volatility (Ann.) [%]'], 3),
+        'Sharpe Ratio': round(stats['Sharpe Ratio'], 3),
+        'Sortino Ratio': round(stats['Sortino Ratio'], 3),
+        'Calmar Ratio': round(stats['Calmar Ratio'], 3),
+        'Max. Drawdown [%]': round(stats['Max. Drawdown [%]'], 3),
+        'Avg. Drawdown [%]': round(stats['Avg. Drawdown [%]'], 3),
+        'Max. Drawdown Duration': str(stats['Max. Drawdown Duration']),
+        'Avg. Drawdown Duration': str(stats['Avg. Drawdown Duration']),
+        '# Trades': stats['# Trades'],
+        'Win Rate [%]': round(stats['Win Rate [%]'], 3),
+        'Best Trade [%]': round(stats['Best Trade [%]'], 3),
+        'Worst Trade [%]': round(stats['Worst Trade [%]'], 3),
+        'Avg. Trade [%]': round(stats['Avg. Trade [%]'], 3),
+        'Max. Trade Duration': str(stats['Max. Trade Duration']),
+        'Avg. Trade Duration': str(stats['Avg. Trade Duration']),
+        'Profit Factor': round(stats['Profit Factor'], 3),
+        'Expectancy [%]': round(stats['Expectancy [%]'], 3),
+        'SQN': round(stats['SQN'], 3)
+    }
+
 def run_backtest(strategy_class, strategy_name):
     print("Working Directory: {}".format(os.getcwd()))
 
