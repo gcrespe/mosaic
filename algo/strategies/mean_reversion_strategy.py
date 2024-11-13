@@ -90,12 +90,14 @@ class MeanReversionStrategy(Strategy):
                 
             size = max(1, int(risk_amount / stop_distance))
             
-            # Adjust limit price to be slightly above the current price
-            limit_price = price + 0.01  # Set limit price slightly above the current price
+            # Set limit price to be between SL and TP
+            limit_price = price  # Start with the current price
             
-            # Ensure limit price is below TP and above SL
-            if limit_price >= tp_level or limit_price <= stop_level:
-                limit_price = stop_level + 0.01  # Adjust limit price to be just above SL
+            # Ensure limit price is valid
+            if limit_price >= tp_level:
+                limit_price = tp_level  # Set to TP if above
+            elif limit_price <= stop_level:
+                limit_price = stop_level  # Set to SL if below
             
             # Split position for different targets
             main_size = int(size * (1 - self.tp_close))
@@ -122,12 +124,14 @@ class MeanReversionStrategy(Strategy):
                 
             size = max(1, int(risk_amount / stop_distance))
             
-            # Adjust limit price to be slightly below the current price
-            limit_price = price - 0.01  # Set limit price slightly below the current price
+            # Set limit price to be between SL and TP
+            limit_price = price  # Start with the current price
             
-            # Ensure limit price is above TP and below SL
-            if limit_price <= tp_level or limit_price >= stop_level:
-                limit_price = stop_level - 0.01  # Adjust limit price to be just below SL
+            # Ensure limit price is valid
+            if limit_price <= tp_level:
+                limit_price = tp_level  # Set to TP if below
+            elif limit_price >= stop_level:
+                limit_price = stop_level  # Set to SL if above
             
             # Split position for different targets
             main_size = int(size * (1 - self.tp_close))

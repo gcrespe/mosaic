@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from algo.backtesting_utils import run_mean_reversion_backtest
 from algo.backtesting_utils import run_enhanced_trend_backtest
+from algo.backtesting_utils import run_random_trade_backtest
 from algo.data_preprocessing import get_historical_data
 
 backtest_bp = Blueprint('backtest', __name__)
@@ -385,6 +386,110 @@ def enhanced_trend_backtest():
         stats = run_enhanced_trend_backtest(
             df, 
             strategy_params=data.get('strategy_params')
+        )
+        
+        return jsonify(stats)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    
+
+@backtest_bp.route('/backtest/random-trade', methods=['POST'])
+def random_trade_backtest():
+    """ Run Random Trade strategy backtest
+    ---
+    tags:
+      - Backtesting
+    operationId: runRandomTradeBacktest
+    summary: Backtest Random Trade strategy
+    description: Run a backtest of the Random Trade strategy with multiple re-entry attempts
+    parameters:
+      - name: config
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            symbol:
+              type: string
+              example: AAPL
+              description: Trading symbol/ticker
+            timeframe:
+              type: string
+              enum: [1Min, 2Min, 3Min, 5Min, 1Hour, 1Day]
+              example: 1Hour
+              description: Timeframe for the backtest
+            start_date:
+              type: string
+              example: "2024-01-01"
+              description: Start date for the backtest period
+            end_date:
+              type: string
+              example: "2024-12-31"
+              description: End date for the backtest period
+            strategy_params:
+              type: object
+              properties:
+                target_profit:
+                  type: number
+                  example: 0.05
+                  description: Target profit percentage (5% = 0.05)
+                stop_loss:
+                  type: number
+                  example: 0.05
+                  description: Stop loss percentage (5% = 0.05)
+                max_trades:
+                  type: integer
+                  example: 4
+                  description: Maximum number of re-entry attempts
+                risk:
+                  type: number
+                  example: 0.01
+                  description: Risk per trade (1% = 0.01)
+                min_distance:
+                  type: number
+                  example: 0.005
+                  description: Minimum distance between price levels (0.5% = 0.005)
+              required:
+                - target_profit
+                - stop_loss
+                - max_trades
+                - risk
+                - min_distance
+    responses:
+      200:
+        description: Backtest results
+        schema:
+          type: object
+          properties:
+            # ... (rest of the response schema remains the same)
+    """
+    try:
+        data = request.get_json()
+        if not data or 'symbol' not in data:
+            return jsonify({'error': 'Symbol is required'}), 400
+            
+        # Validate strategy parameters
+        strategy_params = data.get('strategy_params', {})
+        required_params = ['target_profit', 'stop_loss', 'max_trades', 'risk', 'min_distance']
+        if not all(param in strategy_params for param in required_params):
+            return jsonify({'error': f'Missing required strategy parameters. Required: {required_params}'}), 400
+            
+        df = get_historical_data(
+            symbol=data['symbol'],
+            timeframe=data.get('timeframe', '1Hour'),
+            start_date=data.get('start_date'),
+            end_date=data.get('end_date')
+        )
+        
+        required_columns = ['Open', 'High', 'Low', 'Close']
+        if not all(col in df.columns for col in required_columns):
+            return jsonify({'error': 'Data missing required columns'}), 400
+        
+        stats = run_random_trade_backtest(
+            df, 
+            strategy_params=strategy_params
         )
         
         return jsonify(stats)
