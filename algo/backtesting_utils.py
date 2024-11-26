@@ -22,7 +22,7 @@ def run_mean_reversion_backtest(data: pd.DataFrame,
                   exclusive_orders=True)
     
     # Run backtest with optional parameters
-    stats = bt.run(**(strategy_params or {}))
+    stats = bt.run(**strategy_params)
     
     # Return statistics with rounded values
     return {
@@ -78,7 +78,7 @@ def run_enhanced_trend_backtest(data: pd.DataFrame,
                   trade_on_close=False)
     
     # Run backtest with optional parameters
-    stats = bt.run(**(strategy_params or {}))
+    stats = bt.run(**strategy_params)
     
     # Return all statistics with rounded values
     return {
@@ -134,7 +134,7 @@ def run_random_trade_backtest(data: pd.DataFrame,
                   exclusive_orders=True)
     
     # Run backtest with optional parameters
-    stats = bt.run(**(strategy_params or {}))
+    stats = bt.run(**strategy_params)
     
     # Return statistics with rounded values
     return {
