@@ -1,6 +1,5 @@
 import alpaca_trade_api as tradeapi
 from alpaca.trading.client import TradingClient
-from alpaca.trading.client import TradingClient
 from alpaca.data.historical import StockHistoricalDataClient
 
 # Alpaca API credentials (use paper trading endpoint)
