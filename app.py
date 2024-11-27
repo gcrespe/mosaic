@@ -31,5 +31,4 @@ def create_app():
     return app
 
 app = create_app()
-app.listen(4000)
 app.run(host="0.0.0.0", debug=True)
