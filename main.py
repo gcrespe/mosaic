@@ -2,7 +2,7 @@ import alpaca_trade_api as alpaca
 import asyncio
 import pandas as pd
 import pytz
-import sys
+from flask import Flask
 import logging
 import time
 
@@ -384,6 +384,8 @@ def main(args):
     finally:
         loop.close()
 
+        
+
 
 if __name__ == '__main__':
     import argparse
@@ -410,3 +412,5 @@ if __name__ == '__main__':
 
     main(parser.parse_args())
     main(parser.parse_args())
+    app = Flask(__name__)
+    app.run(host="0.0.0.0", port=4000, debug=True)

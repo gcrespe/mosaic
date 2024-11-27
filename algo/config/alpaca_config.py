@@ -3,8 +3,8 @@ from alpaca.trading.client import TradingClient
 from alpaca.data.historical import StockHistoricalDataClient
 
 # Alpaca API credentials (use paper trading endpoint)
-ALPACA_API_KEY = 'PKTAVXT2KV81VZ9SMAH0'
-ALPACA_SECRET_KEY = 'af3ZPiFWidZRx3Z66EcMt4mdQ2C724nahSStqleb'
+ALPACA_API_KEY = 'PKUCVU4D283LXUBAGO3J'
+ALPACA_SECRET_KEY = 'efZtmuxXA0EdhYZC4gXwQnrxEN4nPDPNkpUPDaJH'
 ALPACA_BASE_URL = 'https://paper-api.alpaca.markets/'
 
 # Initialize Alpaca API clients
